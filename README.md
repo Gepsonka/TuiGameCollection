@@ -34,3 +34,8 @@ python3 install -r requirements.txt
 # Have fun playing! :)
 
 
+# Dependecy docs:
+
+https://www.textualize.io/
+
+https://docs.python.org/3/library/sqlite3.html
