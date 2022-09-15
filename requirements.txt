@@ -1,4 +1,8 @@
 commonmark==0.9.1
 Pygments==2.13.0
+pytermgui==7.2.0
+PyYAML==6.0
 rich==12.5.1
 textual==0.1.18
+tk==0.1.0
+typing_extensions==4.3.0
