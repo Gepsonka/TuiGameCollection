@@ -1,5 +1,5 @@
 # TuiGameCollection
-Snake and IDK 
+Snake and IDK
 
 
 ## Install
@@ -16,7 +16,7 @@ python3 -m venv <path_to_venv>
 
  - Windows
   ```bash
-  <path_to_venv>/bin/activate
+  <path_to_venv>/Scripts/activate
   ```
 - Linux
 ```bash
