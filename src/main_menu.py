@@ -1,9 +1,7 @@
-from ctypes import alignment
-from tkinter import Button
-from turtle import color, title, width
 import pytermgui as ptg
 from pytermgui.window_manager.manager import WindowManager
 from database import Database
+from time import sleep
 
 
 SNAKE_MATRIX = [
@@ -90,6 +88,8 @@ class MainMenu:
             
             self.manager.add(self.menu_body)
             
+            
+            
     def show_leaderboard(self, manager):
         self.leaderboard = ptg.Window(
             (
@@ -127,7 +127,7 @@ class MainMenu:
                 onclick=lambda *_: self.leaderboard.close()
             ),
             
-            title='Leaderboard',
+            title='[50]Leaderboard',
             width=150
         ).center()
         
