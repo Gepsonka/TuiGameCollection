@@ -1,6 +1,8 @@
-from tkinter import Button
-from turtle import color, title, width
+from turtle import title
 import pytermgui as ptg
+from pytermgui.window_manager.manager import WindowManager
+from database import Database
+from time import sleep
 
 
 SNAKE_MATRIX = [
@@ -34,16 +36,15 @@ BOX_MATRIX = [
 class MainMenu:
     def __init__(self) -> None:
         self.config_manager = ptg.YamlLoader()
-        
-        
         self.build_window()
+        self.db = Database('.game_collection/game_data.db')
         
     def build_window(self):
         with ptg.WindowManager() as self.manager:
             self.header = ptg.Window(
                 '[bold 200]Game Collection',
                 width=100,
-            )
+            )   
             self.header.is_noresize = True
             
             self.snake_pixel_matrix = ptg.DensePixelMatrix.from_matrix(SNAKE_MATRIX)
@@ -75,6 +76,7 @@ class MainMenu:
             
             self.leader_board_btn = ptg.Button(
                 label='[230]Leaderboard',
+                onclick=lambda *_: self.show_leaderboard(self.manager)
             )
             
             self.menu_body = ptg.Window(
@@ -86,3 +88,53 @@ class MainMenu:
             self.menu_body.is_noresize = True
             
             self.manager.add(self.menu_body)
+            
+            
+            
+    def show_leaderboard(self, manager):
+        self.leaderboard = ptg.Window(
+            (
+                ptg.Window(
+                    (
+                        ptg.Window(
+                            *[str(x.nickname) for x in Database('.game_collection/game_data.db').query_snake_top(10)],
+                            width=20,
+                            title='Nickname'
+                            
+                        ),
+                        ptg.Window(
+                            *[str(x.score) for x in Database('.game_collection/game_data.db').query_snake_top(10)],
+                            width=4,
+                            title='Score'
+                        ),
+                    ),
+                    title='[120]Snake'
+                ),
+                
+                ptg.Window(
+                    (
+                        ptg.Window(
+                            *[str(x.nickname) for x in Database('.game_collection/game_data.db').query_box_top(10)],
+                            width=20,
+                            title='Nickname'
+                        ),
+                        ptg.Container(
+                            *[str(x.score) for x in Database('.game_collection/game_data.db').query_box_top(10)],
+                            width=4,
+                            title='Score'
+                        ),
+                    ),
+                    title='[80]Box'
+                ),
+            ),
+            ptg.Button(
+                label='Close',
+                onclick=lambda *_: self.leaderboard.close()
+            ),
+            
+            title='[50]Leaderboard',
+            width=150
+        ).center()
+        
+        manager.add(self.leaderboard)
+    
