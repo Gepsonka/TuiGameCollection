@@ -1,3 +1,4 @@
+from turtle import title
 import pytermgui as ptg
 from pytermgui.window_manager.manager import WindowManager
 from database import Database
@@ -43,7 +44,7 @@ class MainMenu:
             self.header = ptg.Window(
                 '[bold 200]Game Collection',
                 width=100,
-            )
+            )   
             self.header.is_noresize = True
             
             self.snake_pixel_matrix = ptg.DensePixelMatrix.from_matrix(SNAKE_MATRIX)
@@ -110,16 +111,20 @@ class MainMenu:
                     title='[120]Snake'
                 ),
                 
-                (
-                    ptg.Window(
-                        *[str(x.nickname) for x in Database('.game_collection/game_data.db').query_box_top(10)],
-                        width=20
-                        
+                ptg.Window(
+                    (
+                        ptg.Window(
+                            *[str(x.nickname) for x in Database('.game_collection/game_data.db').query_box_top(10)],
+                            width=20,
+                            title='Nickname'
+                        ),
+                        ptg.Container(
+                            *[str(x.score) for x in Database('.game_collection/game_data.db').query_box_top(10)],
+                            width=4,
+                            title='Score'
+                        ),
                     ),
-                    ptg.Container(
-                        *[str(x.score) for x in Database('.game_collection/game_data.db').query_box_top(10)],
-                        width=4
-                    ),
+                    title='[80]Box'
                 ),
             ),
             ptg.Button(
