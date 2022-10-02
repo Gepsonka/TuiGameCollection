@@ -1,8 +1,12 @@
+from ctypes.wintypes import tagMSG
+import time
 from turtle import title
 import pytermgui as ptg
 from pytermgui.window_manager.manager import WindowManager
 from database import Database
 from time import sleep
+import multiprocessing
+from game_views.snake_view import SnakeGame
 
 
 SNAKE_MATRIX = [
@@ -36,11 +40,12 @@ BOX_MATRIX = [
 class MainMenu:
     def __init__(self) -> None:
         self.config_manager = ptg.YamlLoader()
+        self.manager = ptg.WindowManager()
         self.build_window()
         self.db = Database('.game_collection/game_data.db')
+        self.manager.run()
         
     def build_window(self):
-        with ptg.WindowManager() as self.manager:
             self.header = ptg.Window(
                 '[bold 200]Game Collection',
                 width=100,
@@ -50,7 +55,8 @@ class MainMenu:
             self.snake_pixel_matrix = ptg.DensePixelMatrix.from_matrix(SNAKE_MATRIX)
             
             self.snake_btn = ptg.Button(
-                label="[bold italic 255]Snake"
+                label="[bold italic 255]Snake",
+                onclick= lambda *_: self.start_snake_game()
             )
             
             self.box_pixel_matrix = ptg.DensePixelMatrix.from_matrix(BOX_MATRIX)
@@ -58,17 +64,21 @@ class MainMenu:
             self.box_btn = ptg.Button(
                 label="[bold italic 255]Box"
             )
-                        
-            self.body = ptg.Window(
-                (
-                    ptg.Container(
+            
+            self.snake_container = ptg.Container(
                         self.snake_pixel_matrix,
                         self.snake_btn,
-                    ),
-                    ptg.Container(
+                    )
+            
+            self.box_container = ptg.Container(
                         self.box_pixel_matrix,
                         self.box_btn,
                     )
+                        
+            self.body = ptg.Window(
+                (
+                    self.snake_container,
+                    self.box_container
                 ),
                 title="[255]Games"
             )
@@ -87,10 +97,8 @@ class MainMenu:
             ).center()
             self.menu_body.is_noresize = True
             
-            self.manager.add(self.menu_body)
-            
-            
-            
+            self.manager.add(self.menu_body) 
+                                    
     def show_leaderboard(self, manager):
         self.leaderboard = ptg.Window(
             (
@@ -137,4 +145,9 @@ class MainMenu:
         ).center()
         
         manager.add(self.leaderboard)
-    
+        
+    def start_snake_game(self):
+        self.game = SnakeGame()
+        self.game.main_loop()
+        
+        
