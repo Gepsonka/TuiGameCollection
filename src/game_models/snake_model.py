@@ -2,7 +2,6 @@ from enum import Enum
 import random
 from tkinter.tix import DirTree
 from xxlimited import foo
-from .food import Food
 
 class MapState(Enum):
     EMPTY = 0
@@ -55,25 +54,44 @@ class SnakeHead(GameElement):
     def update(self) -> None:
         match self.direction:
             case Direction.UP:
-                self.y = (self.y + 1)%99
+                self.y_poz = (self.y_poz - 1)%99
             
             case Direction.DOWN:
-                self.y = (self.y - 1)%99
+                self.y_poz = (self.y_poz + 1)%99
 
             case Direction.RIGHT:
-                self.x = (self.x + 1)%99
+                self.x_poz = (self.x_poz + 1)%99
                 
             case Direction.LEFT:
-                self.x = (self.x - 1)%99
+                self.x_poz = (self.x_poz - 1)%99
         
     def is_collided_with_bodypart(self, body: list[SnakeBody]) -> bool:
         return any(self == x for x in body)
         
-    def is_food_eaten(self, food: Food) -> bool:
+    def is_food_eaten(self, food) -> bool:
         return self == food
         
         
-    
+class Food(GameElement):
+    def __init__(self) -> None:
+        super().__init__(1, 1)
+        
+    def reposition_food(self, head: SnakeHead, body: list[SnakeBody]) -> None:
+        '''
+        Reposition of food obj after got eaten.
+        Cannot respawn on the poz of snake's head or any of its bodyparts.
+        '''
+        while 1:
+            self.x_poz = random.randint(0, 100)
+            self.y_poz = random.randint(0, 100)
+            
+            if head == self:
+                continue
+            
+            if any(self == x for x in body):
+                continue
+            
+            return
 
 
 class SnakeModel:
@@ -97,7 +115,6 @@ class SnakeModel:
         self.head.update()
         
         self.game_conditions()
-        self.regen_map()
         
     def game_conditions(self):
         self.food_eaten()
@@ -114,12 +131,15 @@ class SnakeModel:
             self.game_state = GameState.GAME_OVER
             
     def move_body(self):
-        for i in range(len(self.body), 0, -1):
+        for i in range(len(self.body)-1, 0, -1):
+            if i == 0:
+                break
             self.body[i].x_poz = self.body[i-1].x_poz
             self.body[i].y_poz = self.body[i-1].y_poz
-            
-        self.body[0].x_poz = self.head.x_poz
-        self.body[0].y_poz = self.head.y_poz
+        
+        if self.body:
+            self.body[0].x_poz = self.head.x_poz
+            self.body[0].y_poz = self.head.y_poz
             
     
     def append_bodypart(self):
@@ -135,22 +155,15 @@ class SnakeModel:
         else:
             match self.head.direction:
                 case Direction.UP:
-                    self.body.append(SnakeBody(self.body[len(self.body)-1].x_poz, self.body[len(self.body)-1].y_poz + 1))
+                    self.body.append(SnakeBody(self.head.x_poz, self.head.y_poz + 1))
                 case Direction.DOWN:
-                    self.body.append(SnakeBody(self.body[len(self.body)-1].x_poz, self.body[len(self.body)-1].y_poz - 1))
+                    self.body.append(SnakeBody(self.head.x_poz, self.head.y_poz - 1))
                 case Direction.RIGHT:
-                    self.body.append(SnakeBody(self.body[len(self.body)-1].x_poz - 1, self.body[len(self.body)-1].y_poz))
+                    self.body.append(SnakeBody(self.head.x_poz - 1, self.head.y_poz))
                 case Direction.LEFT:
-                    self.body.append(SnakeBody(self.body[len(self.body)-1].x_poz + 1, self.body[len(self.body)-1].y_poz))
+                    self.body.append(SnakeBody(self.head.x_poz + 1, self.head.y_poz))
             
-    def regen_map(self):
-        self.map = [[MapState.EMPTY for j in range(100)] for i in range(100)]
-        
-        self.map[self.head.y_poz][self.head.x_poz] = MapState.HEAD
-        self.map[self.food.y_poz][self.food.x_poz] = MapState.FOOD
-        
-        for body in self.body:
-            self.map[body.y_poz][body.x_poz] = MapState.BODY
+    
             
         
 

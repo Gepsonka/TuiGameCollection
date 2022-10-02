@@ -1,7 +1,5 @@
 import sqlite3
 import os
-from turtle import color, width
-import pytermgui as ptg
 from main_menu import MainMenu
 
 
