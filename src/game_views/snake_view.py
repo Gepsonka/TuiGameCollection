@@ -1,5 +1,6 @@
 import pygame
 from game_models.snake_model import SnakeModel, Direction, GameState
+from database import Database
 
 class GameWindow:
     '''
@@ -39,9 +40,11 @@ class SnakeGame(GameWindow):
     bodyparts: coordinate of every bodypart
     food: the exact renderable food element
     '''    
-    def __init__(self) -> None:
+    def __init__(self, nickname: str) -> None:
         super().__init__()
         self.model = SnakeModel()
+        self.nickname = nickname
+        self.db = Database(".game_collection/game_data.db")
 
 
     def main_loop(self):
@@ -68,6 +71,7 @@ class SnakeGame(GameWindow):
             i+=1
             
         
+        self.save_player_score()
         self.exit_game() # after the main loop we exit the game
         exit(0)
 
@@ -107,9 +111,8 @@ class SnakeGame(GameWindow):
         pygame.display.update()
         
         if self.model.game_state == GameState.GAME_OVER:
-            
-            
-        
+            pass
+             
     def draw_head(self):
         pygame.draw.rect(self.win, (57,255,20), (self.model.head.x_poz * 5, self.model.head.y_poz * 5, 5, 5))
 
@@ -120,5 +123,5 @@ class SnakeGame(GameWindow):
     def draw_food(self):
         pygame.draw.rect(self.win, (21,244,238), (self.model.food.x_poz * 5, self.model.food.y_poz * 5, 5, 5))
 
-
-    
+    def save_player_score(self):
+        self.db.add_new_result(self.nickname, 'snake', self.model.score)

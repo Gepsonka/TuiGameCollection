@@ -147,7 +147,7 @@ class MainMenu:
         manager.add(self.leaderboard)
         
     def start_snake_game(self):
-        self.game = SnakeGame()
+        self.game = SnakeGame('gepsonka')
         self.game.main_loop()
         
         

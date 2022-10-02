@@ -23,6 +23,8 @@ def init_env():
             );
             '''
         )
+        
+        conn.commit()
         conn.close()
         
         
